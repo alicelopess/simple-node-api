@@ -1,5 +1,6 @@
 import http from 'node:http' //ES Modules
 import { randomUUID } from 'node:crypto' //Unique ID for each user
+import { reqValidator } from './middlewares/req-validator.js'
 
 //Create temporary DB
 const users = []
@@ -8,26 +9,9 @@ const users = []
 const server = http.createServer(async (request, response) => {
     //TODO: Get Request Method & URL
     const {method, url} = request //destructuring
-    
-    //Streams
-    //request => readable stream
-    //response => writable stream
 
-    //TODO: Create buffer array to collect all chunks from request
-    const buffers = [] 
-
-    // await reading - receiving the request body
-    for await (const chunk of request) {
-        buffers.push(chunk)
-    }
-
-    try {
-        request.body = JSON.parse(Buffer.concat(buffers).toString()) //Transforms the array of buffers into a string and then into a JSON object
-        console.log(request.body)
-    } catch {
-        request.body = null
-    }
-
+    //Request body collection middleware
+    await reqValidator(request)
 
     //TODO: Create Users CRUD Routes
 
@@ -41,6 +25,8 @@ const server = http.createServer(async (request, response) => {
             name,
             email,
         })
+
+        console.log(users) //test
 
         return response
             .writeHead(201) //Status Code
