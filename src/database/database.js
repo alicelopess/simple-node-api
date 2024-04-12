@@ -1,9 +1,30 @@
+import fs from 'node:fs/promises'
+
 //Creating a database based on files
 // --Model: { "users": [{user}, ...] }
 // --Command: database[table] => [{user}, ...]
 
+//TODO: set the path of the db persistence file
+const databasePath = new URL('../../db.json', import.meta.url)
+
 export class Database {
     #database = {} //private propertie -  cannot be legally referenced outside of the class
+
+    //db persistence
+    constructor() {
+        fs.readFile(databasePath, 'utf8')
+            .then(data => {
+                this.#database = JSON.parse(data)
+            })
+            .catch(() => {
+                this.#persist()
+            })
+    }
+
+    #persist() {
+        fs.writeFile('db.json', JSON.stringify(this.#database)) //Must be of type string or buffer
+    }
+
 
     //TODO: receive data and insert it into the database
     insert(table, data) { //method
@@ -12,6 +33,8 @@ export class Database {
         } else {
             this.#database[table] = [data]
         }
+
+        this.#persist()
 
         return data
     }
