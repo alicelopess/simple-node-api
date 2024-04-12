@@ -1,20 +1,45 @@
 import http from 'node:http' //ES Modules
+import { randomUUID } from 'node:crypto' //Unique ID for each user
 
 //Create temporary DB
 const users = []
 
 //Create Native Server
-const server = http.createServer((request, response) => {
+const server = http.createServer(async (request, response) => {
     //TODO: Get Request Method & URL
     const {method, url} = request //destructuring
+    
+    //Streams
+    //request => readable stream
+    //response => writable stream
+
+    //TODO: Create buffer array to collect all chunks from request
+    const buffers = [] 
+
+    // await reading - receiving the request body
+    for await (const chunk of request) {
+        buffers.push(chunk)
+    }
+
+    try {
+        request.body = JSON.parse(Buffer.concat(buffers).toString()) //Transforms the array of buffers into a string and then into a JSON object
+        console.log(request.body)
+    } catch {
+        request.body = null
+    }
+
 
     //TODO: Create Users CRUD Routes
 
     if(method == 'POST' && url == '/users') {
+        //TODO: Get Request Body
+
+        const {name, email} = request.body
+
         users.push({
-            id: 1,
-            name: 'Alice Dantas',
-            email: 'alice@email.com'
+            id: randomUUID(),
+            name,
+            email,
         })
 
         return response
@@ -29,7 +54,7 @@ const server = http.createServer((request, response) => {
     }
 
     return response
-        .writeHead(404) //Not Found
+        .writeHead(404) //Route | Resource Not Found
         .end()
 })
 
