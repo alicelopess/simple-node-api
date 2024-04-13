@@ -55,4 +55,16 @@ export class Database {
             this.#persist()
         }
     }
+
+    //TODO: read data and update on database
+    update(table, id, data) { //method
+        const rowIndex = this.#database[table].findIndex(row => row.id == id)
+
+        if (rowIndex > -1) { //if exists
+            this.#database[table][rowIndex] = {id, ...data}
+            this.#persist()
+        }
+
+        return data
+    }
 }
