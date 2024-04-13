@@ -2,6 +2,7 @@ import http from 'node:http' //ES Modules
 import { reqValidator } from './middlewares/req-validator.js'
 import { routes } from './middlewares/routes.js'
 import { Database } from './database/database.js'
+import { extractQueryParams } from './utils/extract-route-params.js'
 
 //Database
 const database = new Database()
@@ -23,10 +24,16 @@ const server = http.createServer(async (request, response) => {
         const routeParams = request.url.match(route.path)
         console.log(routeParams) //test
         
-        request.params = { ...routeParams.groups } //spread syntax
+        const { query, ...params } = routeParams.groups
+
+        request.params = params 
         console.log(request.params) //test
 
+        request.query = query ? extractQueryParams(query) : {}
+        console.log(request.query) //test
+
         route.handler(request, response)
+
     } else {
         return response
         .writeHead(404) //Route | Resource Not Found
