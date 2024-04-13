@@ -10,8 +10,13 @@ export const routes = [
         method: 'GET',
         path: buildRoutePath('/users'),
         handler: (request, response) => {
+            const { search } = req.query //Identifies search
+
             //TODO: Get users table
-            const users = database.select('users')
+            const users = database.select('users', search ? {
+                name: search,
+                email: search,
+            } : null)
 
             return response
                 .setHeader('Content-type', 'application/json') //Response data type 

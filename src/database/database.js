@@ -40,8 +40,16 @@ export class Database {
     }
 
     //TODO: read database and return data
-    select(table) { //method
-        const data = this.#database[table] ?? [] //nullish coalescing operator
+    select(table, search) { //method
+        let data = this.#database[table] ?? [] //nullish coalescing operator
+
+        if (search) { //creates filter for query params
+            data = data.filter(row => {
+                return Object.entries(search).some(([key, value]) => {
+                    return row[key].toLowerCase().includes(value.toLowerCase())
+                })
+            })
+        }
 
         return data
     }
