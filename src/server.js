@@ -21,7 +21,10 @@ const server = http.createServer(async (request, response) => {
 
     if (route) { //if exists
         const routeParams = request.url.match(route.path)
-        console.log(routeParams)
+        console.log(routeParams) //test
+        
+        request.params = { ...routeParams.groups } //spread syntax
+        console.log(request.params) //test
 
         route.handler(request, response)
     } else {
