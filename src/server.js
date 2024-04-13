@@ -16,10 +16,13 @@ const server = http.createServer(async (request, response) => {
 
     //TODO: Validate routes
     const route = routes.find(route => {
-        return route.method == method && route.path == url
+        return route.method == method && route.path.test(url)
     })
 
     if (route) { //if exists
+        const routeParams = request.url.match(route.path)
+        console.log(routeParams)
+
         route.handler(request, response)
     } else {
         return response
